@@ -11,4 +11,4 @@ class AudioMothSchema(pa.DataFrameModel):
     confidence: float = pa.Field(ge=0.0, le=1.0, coerce=True)
     file: str = pa.Field(coerce=True)
     date: Series[pd.Timestamp] = pa.Field(coerce=True)
-    # time: Series[pd.Timestamp] = pa.Field(coerce=True, nullable=True)
+    time: Series[pd.Timestamp] = pa.Field(coerce=True, nullable=True)

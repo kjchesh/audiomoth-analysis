@@ -2,6 +2,7 @@
 
 import pandas as pd
 from pathlib import Path
+import datetime as dt
 
 
 def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
@@ -13,6 +14,37 @@ def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
             for c in df.columns
         }
     )
+    return df
+
+
+def combine_date_and_time(
+    df: pd.DataFrame,
+    date_col: str,
+    time_col: str,
+    output_col: str = "timestamp",
+) -> pd.DataFrame:
+    """
+    Combine a date column and a time column into a single datetime64[ns] column.
+
+    Assumes:
+        - date_col contains datetime64, datetime.date, or string-parsable dates
+        - time_col contains datetime.time objects
+
+    Result:
+        df[output_col] is a pandas datetime64[ns] column.
+    """
+    df = df.copy()
+
+    # Ensure date column is pandas datetime
+    df[date_col] = pd.to_datetime(df[date_col], errors="coerce")
+
+    def _combine(d, t):
+        if pd.isna(d) or t is None or not isinstance(t, dt.time):
+            return pd.NaT
+        return pd.Timestamp.combine(d.date(), t)
+
+    df[output_col] = [_combine(d, t) for d, t in zip(df[date_col], df[time_col])]
+
     return df
 
 
