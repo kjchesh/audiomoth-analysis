@@ -3,6 +3,8 @@
 import src.normaliser as normaliser
 import pandas as pd
 from pathlib import Path
+import datetime as dt
+
 
 MOCK_OVERVIEW_DF = pd.DataFrame(
     {
@@ -88,6 +90,43 @@ def test_clean_audiomoth_data():
     # ASSERT
     expected_columns = MOCK_DEVICE_DF.columns.tolist()
     assert list(df.columns) == expected_columns
+
+
+def test_combine_date_and_time():
+    # ARRANGE
+    df = pd.DataFrame(
+        {
+            "date": ["2024-01-01", "2024-01-02", None],
+            "time": [
+                dt.time(13, 5),
+                dt.time(7, 30),
+                dt.time(22, 45),  # but date is NaT → result should be NaT
+            ],
+        }
+    )
+
+    # Expected combined timestamp results
+    expected = pd.Series(
+        [
+            pd.Timestamp("2024-01-01 13:05:00"),
+            pd.Timestamp("2024-01-02 07:30:00"),
+            pd.NaT,
+        ],
+        name="timestamp",
+        dtype="datetime64[ns]",
+    )
+
+    # ACT
+    result = normaliser.combine_date_and_time(
+        df, "date", "time", output_col="timestamp"
+    )
+
+    # ASSERT
+    assert "timestamp" in result.columns
+    assert result["timestamp"].dtype == "datetime64[ns]"
+
+    # Compare the output column to expected
+    pd.testing.assert_series_equal(result["timestamp"], expected)
 
 
 def test_get_excel_sheets() -> None:
