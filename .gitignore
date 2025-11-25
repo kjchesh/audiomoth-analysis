@@ -33,3 +33,5 @@ data_raw/
 
 # VSCode & editor junk (optional but recommended)
 .vscode/
+
+requirements-freeze.txt
