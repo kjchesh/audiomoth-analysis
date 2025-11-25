@@ -1,7 +1,35 @@
+# === Python ===
 __pycache__/
-.ipynb_checkpoints/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.pkl
+*.egg-info/
+*.egg
+build/
+dist/
+
+# === Environment & secrets ===
 .env
+.env.*
+
+
+# === Testing ===
+.pytest_cache/
+.coverage
+.cache/
+htmlcov/
+
+# Data files (raw & exported)
 *.xlsx
 *.csv
 tmp/
-/data_raw/
+data_raw/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# VSCode & editor junk (optional but recommended)
+.vscode/
