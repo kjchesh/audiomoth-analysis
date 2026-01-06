@@ -1,0 +1,13 @@
+pandas
+numpy
+openpyxl
+pytest
+matplotlib
+jupyter
+ipykernel
+
+# Dev tools
+pre-commit
+black
+ruff
+nbstripout
