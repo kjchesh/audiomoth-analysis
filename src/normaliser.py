@@ -49,10 +49,13 @@ def combine_date_and_time(
 
 
 def get_excel_sheets(excel_path: Path) -> dict[str, pd.DataFrame]:
-    """Read all sheets from the given Excel file into a dictionary of DataFrames."""
+    """Read all sheets from the given Excel file into a dictionary of
+    DataFrames. Each DataFrame will have cleaned column names.
+    """
     sheets = pd.read_excel(excel_path, sheet_name=None)
     for name, df in sheets.items():
-        df = clean_column_names(df)
+        new_df = clean_column_names(df)
+        sheets[name] = new_df
     return sheets
 
 
@@ -66,7 +69,7 @@ def flatten_data(sheets: dict[str, pd.DataFrame]) -> pd.DataFrame:
         - Each remaining sheet is a device, and the sheet name is the device_id
     """
     # Split out the overview sheet, keep the rest as device sheets
-    overview_df = sheets.pop("overview")  # overview_df is now your metadata
+    overview_df = sheets.pop("Overview")  # overview_df is now your metadata
     # table
     device_dfs = []
 

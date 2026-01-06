@@ -12,7 +12,7 @@ MOCK_OVERVIEW_DF = pd.DataFrame(
         "site": ["SiteA", "SiteB"],
         "location_id": ["SA1", "SB1"],
         "habitat": ["Forest", "Grassland"],
-        "W3W": ["mock.three.words", "three.mocked.words"],
+        "w3w": ["mock.three.words", "three.mocked.words"],
         "deployment_date": ["2025-02-10", "2025-02-11"],
         "deployment_time": ["12:00:00", "13:00:00"],
     }
@@ -58,7 +58,7 @@ MOCK_MERGED_DEVICE_DF = pd.DataFrame(
         "site": ["SiteA", "SiteA", "SiteB", "SiteB"],
         "location_id": ["SA1", "SA1", "SB1", "SB1"],
         "habitat": ["Forest", "Forest", "Grassland", "Grassland"],
-        "W3W": [
+        "w3w": [
             "mock.three.words",
             "mock.three.words",
             "three.mocked.words",
@@ -133,7 +133,7 @@ def test_get_excel_sheets() -> None:
     """Test that we can read all sheets from an Excel file."""
     # ARRANGE
     excel_content = {
-        "Overview": MOCK_OVERVIEW_DF,
+        "overview": MOCK_OVERVIEW_DF,
         "AM123": MOCK_DEVICE_DF,
     }
     excel_path = "mock_audiomoth.xlsx"
@@ -158,7 +158,7 @@ def test_flatten_data():
     device_df_2 = MOCK_DEVICE_DF.copy()
     overview_df = MOCK_OVERVIEW_DF.copy()
     sheets = {
-        "overview": overview_df,
+        "Overview": overview_df,
         "AM123": device_df,
         "AM124": device_df_2,
     }

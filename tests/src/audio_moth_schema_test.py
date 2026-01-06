@@ -1,12 +1,13 @@
-""""Tests to confirm the AudioMoth schema can take in the data and convert types as expected."""
+""" "Tests to confirm the AudioMoth schema can take in the data and convert types as expected."""
+
 import src.audio_moth_schema as audiomoth_schema
 import src.normaliser as normaliser
-from io import StringIO
 import pandas as pd
 import pandas.api.types as ptypes
 
+
 def test_validate_audiomoth_data() -> None:
-    """ Test that the Audiomoth data is validated correctly. """
+    """Test that the Audiomoth data is validated correctly."""
     # ARRANGE
     df = pd.DataFrame(
         {
@@ -21,7 +22,7 @@ def test_validate_audiomoth_data() -> None:
         }
     )
 
-    df = normaliser.clean_audiomoth_column_names(df)
+    df = normaliser.clean_column_names(df)
     # ACT
     validated_df = audiomoth_schema.AudioMothSchema.validate(df)
 
