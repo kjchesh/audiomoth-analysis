@@ -6,71 +6,7 @@ from pathlib import Path
 import datetime as dt
 
 
-MOCK_OVERVIEW_DF = pd.DataFrame(
-    {
-        "device": ["AM123", "AM124"],
-        "site": ["SiteA", "SiteB"],
-        "location_id": ["SA1", "SB1"],
-        "habitat": ["Forest", "Grassland"],
-        "w3w": ["mock.three.words", "three.mocked.words"],
-        "deployment_date": ["2025-02-10", "2025-02-11"],
-        "deployment_time": ["12:00:00", "13:00:00"],
-    }
-)
-
-MOCK_DEVICE_DF = pd.DataFrame(
-    {
-        "start_s": [27, 25],
-        "end_s": [30, 33],
-        "scientific_name": ["Strix aluco", "Troglodytes troglodytes"],
-        "common_name": ["Tawny Owl", "Eurasian Wren"],
-        "confidence": [0.8164, 0.9123],
-        "file": [
-            "D:/Feb 10 - 16\\20250210_130500.WAV",
-            "D:/Feb 10 - 16\\20250211_131000.WAV",
-        ],
-        "date": ["10-02-2025", "10-02-2025"],
-        "time": ["13:05:00", "13:10:00"],
-    }
-)
-
-MOCK_MERGED_DEVICE_DF = pd.DataFrame(
-    {
-        "start_s": [27, 25, 27, 25],
-        "end_s": [30, 33, 30, 33],
-        "scientific_name": [
-            "Strix aluco",
-            "Troglodytes troglodytes",
-            "Strix aluco",
-            "Troglodytes troglodytes",
-        ],
-        "common_name": ["Tawny Owl", "Eurasian Wren", "Tawny Owl", "Eurasian Wren"],
-        "confidence": [0.8164, 0.9123, 0.8164, 0.9123],
-        "file": [
-            "D:/Feb 10 - 16\\20250210_130500.WAV",
-            "D:/Feb 10 - 16\\20250211_131000.WAV",
-            "D:/Feb 10 - 16\\20250210_130500.WAV",
-            "D:/Feb 10 - 16\\20250211_131000.WAV",
-        ],
-        "date": ["10-02-2025", "10-02-2025", "10-02-2025", "10-02-2025"],
-        "time": ["13:05:00", "13:10:00", "13:05:00", "13:10:00"],
-        "device": ["AM123", "AM123", "AM124", "AM124"],
-        "site": ["SiteA", "SiteA", "SiteB", "SiteB"],
-        "location_id": ["SA1", "SA1", "SB1", "SB1"],
-        "habitat": ["Forest", "Forest", "Grassland", "Grassland"],
-        "w3w": [
-            "mock.three.words",
-            "mock.three.words",
-            "three.mocked.words",
-            "three.mocked.words",
-        ],
-        "deployment_date": ["2025-02-10", "2025-02-10", "2025-02-11", "2025-02-11"],
-        "deployment_time": ["12:00:00", "12:00:00", "13:00:00", "13:00:00"],
-    }
-)
-
-
-def test_clean_audiomoth_data():
+def test_clean_audiomoth_data(device_df: pd.DataFrame):
     """Test that the Audiomoth data is cleaned correctly."""
     # ARRANGE
     df = pd.DataFrame(
@@ -88,7 +24,7 @@ def test_clean_audiomoth_data():
     # ACT
     df = normaliser.clean_column_names(df)
     # ASSERT
-    expected_columns = MOCK_DEVICE_DF.columns.tolist()
+    expected_columns = device_df.columns.tolist()
     assert list(df.columns) == expected_columns
 
 
@@ -129,12 +65,12 @@ def test_combine_date_and_time():
     pd.testing.assert_series_equal(result["timestamp"], expected)
 
 
-def test_get_excel_sheets() -> None:
+def test_get_excel_sheets(overview_df: pd.DataFrame, device_df: pd.DataFrame) -> None:
     """Test that we can read all sheets from an Excel file."""
     # ARRANGE
     excel_content = {
-        "overview": MOCK_OVERVIEW_DF,
-        "AM123": MOCK_DEVICE_DF,
+        "overview": overview_df,
+        "AM123": device_df,
     }
     excel_path = "mock_audiomoth.xlsx"
     with pd.ExcelWriter(excel_path) as writer:
@@ -150,13 +86,15 @@ def test_get_excel_sheets() -> None:
         )
 
 
-def test_flatten_data():
+def test_flatten_data(
+    device_df: pd.DataFrame, overview_df: pd.DataFrame, device_overview_df: pd.DataFrame
+) -> None:
     """Test to confirm flattening of device data with overview metadata behaves
     as expected."""
     # ARRANGE
-    device_df = MOCK_DEVICE_DF.copy()
-    device_df_2 = MOCK_DEVICE_DF.copy()
-    overview_df = MOCK_OVERVIEW_DF.copy()
+    device_df = device_df.copy()
+    device_df_2 = device_df.copy()
+    overview_df = overview_df.copy()
     sheets = {
         "Overview": overview_df,
         "AM123": device_df,
@@ -166,6 +104,4 @@ def test_flatten_data():
     merged_df = normaliser.flatten_data(sheets)
     # ASSERT
     # ensure the merged dataframe matches the expected dataframe
-    pd.testing.assert_frame_equal(
-        merged_df.reset_index(drop=True), MOCK_MERGED_DEVICE_DF
-    )
+    pd.testing.assert_frame_equal(merged_df.reset_index(drop=True), device_overview_df)
