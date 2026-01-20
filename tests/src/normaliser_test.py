@@ -87,18 +87,18 @@ def test_get_excel_sheets(overview_df: pd.DataFrame, device_df: pd.DataFrame) ->
 
 
 def test_flatten_data(
-    device_df: pd.DataFrame, overview_df: pd.DataFrame, device_overview_df: pd.DataFrame
+    overview_df: pd.DataFrame,
+    all_devices_df: pd.DataFrame,
+    device_overview_df: pd.DataFrame,
 ) -> None:
     """Test to confirm flattening of device data with overview metadata behaves
     as expected."""
     # ARRANGE
-    device_df = device_df.copy()
-    device_df_2 = device_df.copy()
+    devices_df = all_devices_df.copy()
     overview_df = overview_df.copy()
     sheets = {
         "Overview": overview_df,
-        "AM123": device_df,
-        "AM124": device_df_2,
+        "All Data": devices_df,
     }
     # ACT
     merged_df = normaliser.flatten_data(sheets)

@@ -60,46 +60,23 @@ def get_excel_sheets(excel_path: Path) -> dict[str, pd.DataFrame]:
 
 
 def flatten_data(sheets: dict[str, pd.DataFrame]) -> pd.DataFrame:
-    """
-    Combine the Overview sheet with all device sheets and return a single
-    flat DataFrame where each row represents one detection event.
+    # Read the two sheets
+    overview = sheets["Overview"]
+    all_data = sheets["All Data"]
+    # Flatten: attach overview metadata to every detection row
+    flat = all_data.merge(
+        overview,
+        on="device",
+        how="left",  # keep all detections even if some metadata missing
+        validate="m:1",  # ensures only one overview row per device, no duplication of detections
+    )
+    # or more simply:
+    overview_cols = overview.columns
 
-    Assumes:
-        - "Overview" contains device metadata (location, deployment dates, etc.)
-        - Each remaining sheet is a device, and the sheet name is the device_id
-    """
-    # Split out the overview sheet, keep the rest as device sheets
-    overview_df = sheets.pop("Overview")  # overview_df is now your metadata
-    # table
-    device_dfs = []
+    mask = flat[overview_cols].isna().all(axis=1)
 
-    for sheet_name, df in sheets.items():
-        device_id = sheet_name  # sheet name == device id
+    unmatched_devices = flat.loc[mask, "device"].unique()
 
-        # Find the matching row in the overview sheet
-        meta_row = overview_df.loc[overview_df["device"] == device_id]
+    print("Devices missing overview metadata:", unmatched_devices)
 
-        if meta_row.empty:
-            # No metadata found for this device – you can skip or warn
-            print(f"Warning: no overview metadata for device '{device_id}'")
-            continue
-
-        # Take the first (and usually only) matching row as a Series
-        meta = meta_row.iloc[0]
-
-        # Optionally add device_id as a column to the device dataframe
-        if "device" not in df.columns:
-            df["device"] = device_id
-
-        # Broadcast all metadata columns onto each row of this device df
-        for col, val in meta.items():
-            # Avoid overwriting existing columns in the device data
-            if col not in df.columns:
-                df[col] = val
-
-        device_dfs.append(df)
-
-    # Combine all device dataframes into one big dataframe
-    combined_df = pd.concat(device_dfs, ignore_index=True)
-
-    return combined_df
+    return flat
