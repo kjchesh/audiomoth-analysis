@@ -1,4 +1,13 @@
 repos:
+  # Run unit tests (pytest)
+  - repo: local
+    hooks:
+      - id: pytest
+        name: Run pytest
+        entry: pytest -q
+        language: system
+        files: ^tests/.*\.py$
+
   # Black - code formatter
   - repo: https://github.com/psf/black
     rev: 24.8.0
