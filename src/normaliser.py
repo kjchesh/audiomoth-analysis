@@ -1,4 +1,4 @@
-"""The audiomoth data needs some basic cleaning to have consistent column names and types."""
+"""The audiomoth data needs some basic cleaning to have consistent column names and types. Once completed the data can be validated against the schema."""
 
 import pandas as pd
 from pathlib import Path
@@ -15,6 +15,22 @@ def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     return df
+
+
+def to_time(value) -> dt.time | None:
+    if pd.isna(value):
+        return None
+
+    # Already a time
+    if isinstance(value, dt.time):
+        return value
+
+    # Pandas Timestamp
+    if isinstance(value, pd.Timestamp):
+        return value.time()
+
+    # String (13:05, 1:05 PM, etc.)
+    return pd.to_datetime(value, errors="raise").time()
 
 
 def combine_date_and_time(
@@ -35,6 +51,8 @@ def combine_date_and_time(
     """
     df = df.copy()
 
+    # Parse time flexibly (handles 13:05, 1:05 PM, datetime.time)
+    df[time_col] = df[time_col].map(to_time)
     # Ensure date column is pandas datetime
     df[date_col] = pd.to_datetime(df[date_col], errors="coerce")
 

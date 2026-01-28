@@ -16,7 +16,6 @@ def test_clean_audiomoth_data(device_df: pd.DataFrame):
             "Scientific Name": ["Strix aluco", "Troglodytes troglodytes"],
             "Common Name": ["Tawny Owl", "Eurasian Wren"],
             "Confidence": [0.8164, 0.9123],
-            "File": ["D:/Feb 10 - 16\\20250210_130500.WAV"] * 2,
             "Date": ["10-02-2025", "10-02-2025"],
             "Time": ["13:05:00", "13:10:00"],
         }
@@ -32,11 +31,12 @@ def test_combine_date_and_time():
     # ARRANGE
     df = pd.DataFrame(
         {
-            "date": ["2024-01-01", "2024-01-02", None],
+            "date": ["2024-01-01", "2024-01-02", None, "2024-01-04"],
             "time": [
                 dt.time(13, 5),
                 dt.time(7, 30),
                 dt.time(22, 45),  # but date is NaT → result should be NaT
+                "12:34",
             ],
         }
     )
@@ -47,6 +47,7 @@ def test_combine_date_and_time():
             pd.Timestamp("2024-01-01 13:05:00"),
             pd.Timestamp("2024-01-02 07:30:00"),
             pd.NaT,
+            pd.Timestamp("2024-01-04 12:34:00"),
         ],
         name="timestamp",
         dtype="datetime64[ns]",
@@ -89,7 +90,7 @@ def test_get_excel_sheets(overview_df: pd.DataFrame, device_df: pd.DataFrame) ->
 def test_flatten_data(
     overview_df: pd.DataFrame,
     all_devices_df: pd.DataFrame,
-    device_overview_df: pd.DataFrame,
+    flattened_data_set: pd.DataFrame,
 ) -> None:
     """Test to confirm flattening of device data with overview metadata behaves
     as expected."""
@@ -104,4 +105,4 @@ def test_flatten_data(
     merged_df = normaliser.flatten_data(sheets)
     # ASSERT
     # ensure the merged dataframe matches the expected dataframe
-    pd.testing.assert_frame_equal(merged_df.reset_index(drop=True), device_overview_df)
+    pd.testing.assert_frame_equal(merged_df.reset_index(drop=True), flattened_data_set)
