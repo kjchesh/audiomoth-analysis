@@ -4,6 +4,28 @@ import src.normaliser as normaliser
 import pandas as pd
 from pathlib import Path
 import datetime as dt
+import pytest
+
+
+def test_get_excel_sheets(overview_df: pd.DataFrame, device_df: pd.DataFrame) -> None:
+    """Test that we can read all sheets from an Excel file."""
+    # ARRANGE
+    excel_content = {
+        "overview": overview_df,
+        "AM123": device_df,
+    }
+    excel_path = "mock_audiomoth.xlsx"
+    with pd.ExcelWriter(excel_path) as writer:
+        for sheet_name, df in excel_content.items():
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
+    # ACT
+    sheets = normaliser.get_excel_sheets(Path(excel_path))
+    # ASSERT
+    assert set(sheets.keys()) == set(excel_content.keys())
+    for sheet_name, df in sheets.items():
+        pd.testing.assert_frame_equal(
+            df.reset_index(drop=True), excel_content[sheet_name]
+        )
 
 
 def test_clean_audiomoth_data(device_df: pd.DataFrame):
@@ -66,25 +88,37 @@ def test_combine_date_and_time():
     pd.testing.assert_series_equal(result["timestamp"], expected)
 
 
-def test_get_excel_sheets(overview_df: pd.DataFrame, device_df: pd.DataFrame) -> None:
-    """Test that we can read all sheets from an Excel file."""
-    # ARRANGE
-    excel_content = {
-        "overview": overview_df,
-        "AM123": device_df,
-    }
-    excel_path = "mock_audiomoth.xlsx"
-    with pd.ExcelWriter(excel_path) as writer:
-        for sheet_name, df in excel_content.items():
-            df.to_excel(writer, sheet_name=sheet_name, index=False)
-    # ACT
-    sheets = normaliser.get_excel_sheets(Path(excel_path))
-    # ASSERT
-    assert set(sheets.keys()) == set(excel_content.keys())
-    for sheet_name, df in sheets.items():
-        pd.testing.assert_frame_equal(
-            df.reset_index(drop=True), excel_content[sheet_name]
-        )
+def test_to_time_valid_input():
+    """Test the to_time function with various inputs."""
+
+    # Arrange
+    str_24_hour = "13:05"
+    str_12_hour = "1:05 PM"
+    dt_time_obj = dt.time(9, 30)
+    nan_value = pd.NaT
+
+    # Act
+    str_24_hour_result = normaliser.to_time(str_24_hour)
+    str_12_hour_result = normaliser.to_time(str_12_hour)
+    dt_time_obj_result = normaliser.to_time(dt_time_obj)
+    nan_value_result = normaliser.to_time(nan_value)
+
+    # Assert
+    assert str_24_hour_result == dt.time(13, 5)
+    assert str_12_hour_result == dt.time(13, 5)
+    assert dt_time_obj_result == dt.time(9, 30)
+    assert nan_value_result is None
+
+
+def test_to_time_invalid_input():
+    """Test the to_time function with invalid input."""
+    # Arrange
+    invalid_str = "invalid time string"
+
+    # Act & Assert
+
+    with pytest.raises(ValueError):
+        normaliser.to_time(invalid_str)
 
 
 def test_flatten_data(

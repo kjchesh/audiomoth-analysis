@@ -5,6 +5,17 @@ from pathlib import Path
 import datetime as dt
 
 
+def get_excel_sheets(excel_path: Path) -> dict[str, pd.DataFrame]:
+    """Read all sheets from the given Excel file into a dictionary of
+    DataFrames. Each DataFrame will have cleaned column names.
+    """
+    sheets = pd.read_excel(excel_path, sheet_name=None)
+    for name, df in sheets.items():
+        new_df = clean_column_names(df)
+        sheets[name] = new_df
+    return sheets
+
+
 def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
     """Clean the dataframe to have consistent column names and types."""
     # Lowercase/underscore column names
@@ -15,22 +26,6 @@ def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
         }
     )
     return df
-
-
-def to_time(value) -> dt.time | None:
-    if pd.isna(value):
-        return None
-
-    # Already a time
-    if isinstance(value, dt.time):
-        return value
-
-    # Pandas Timestamp
-    if isinstance(value, pd.Timestamp):
-        return value.time()
-
-    # String (13:05, 1:05 PM, etc.)
-    return pd.to_datetime(value, errors="raise").time()
 
 
 def combine_date_and_time(
@@ -44,7 +39,6 @@ def combine_date_and_time(
 
     Assumes:
         - date_col contains datetime64, datetime.date, or string-parsable dates
-        - time_col contains datetime.time objects
 
     Result:
         df[output_col] is a pandas datetime64[ns] column.
@@ -66,15 +60,23 @@ def combine_date_and_time(
     return df
 
 
-def get_excel_sheets(excel_path: Path) -> dict[str, pd.DataFrame]:
-    """Read all sheets from the given Excel file into a dictionary of
-    DataFrames. Each DataFrame will have cleaned column names.
+def to_time(value) -> dt.time | None:
+    """Transform a value into a datetime.time object.
+    Handles strings and pandas Timestamps.
     """
-    sheets = pd.read_excel(excel_path, sheet_name=None)
-    for name, df in sheets.items():
-        new_df = clean_column_names(df)
-        sheets[name] = new_df
-    return sheets
+    if pd.isna(value):
+        return None
+
+    # Already a time
+    if isinstance(value, dt.time):
+        return value
+
+    # Pandas Timestamp
+    if isinstance(value, pd.Timestamp):
+        return value.time()
+
+    # String (13:05, 1:05 PM, etc.)
+    return pd.to_datetime(value, errors="raise").time()
 
 
 def flatten_data(sheets: dict[str, pd.DataFrame]) -> pd.DataFrame:
