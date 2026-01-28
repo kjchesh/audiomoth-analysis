@@ -6,8 +6,12 @@ repos:
         name: Run pytest
         entry: pytest -q
         language: system
-        files: ^tests/.*\.py$
-
+        pass_filenames: false
+        files: |
+          (?x)^(
+            src/.*\.py|
+            tests/.*\.py
+          )$
   # Black - code formatter
   - repo: https://github.com/psf/black
     rev: 24.8.0
