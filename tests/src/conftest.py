@@ -10,7 +10,7 @@ def overview_df() -> pd.DataFrame:
         {
             "device": ["AM123", "AM124"],
             "site": ["SiteA", "SiteB"],
-            "location_id": ["SA1", "SB1"],
+            "location": ["SA1", "SB1"],
             "habitat": ["Forest", "Grassland"],
             "w3w": ["mock.three.words", "three.mocked.words"],
             "deployment_date": ["2025-02-10", "2025-02-11"],
@@ -73,7 +73,7 @@ def flattened_data_set() -> pd.DataFrame:
             "time": ["13:05:00", "13:10:00", "13:05:00", "13:10:00"],
             "device": ["AM123", "AM123", "AM124", "AM124"],
             "site": ["SiteA", "SiteA", "SiteB", "SiteB"],
-            "location_id": ["SA1", "SA1", "SB1", "SB1"],
+            "location": ["SA1", "SA1", "SB1", "SB1"],
             "habitat": ["Forest", "Forest", "Grassland", "Grassland"],
             "w3w": [
                 "mock.three.words",
@@ -109,7 +109,7 @@ def normalised_data_set() -> pd.DataFrame:
             ],
             "device": ["AM123", "AM123", "AM124", "AM124"],
             "site": ["SiteA", "SiteA", "SiteB", "SiteB"],
-            "location_id": ["SA1", "SA1", "SB1", "SB1"],
+            "location": ["SA1", "SA1", "SB1", "SB1"],
             "habitat": ["Forest", "Forest", "Grassland", "Grassland"],
             "w3w": [
                 "mock.three.words",

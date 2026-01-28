@@ -12,7 +12,7 @@ class AudioMothSchema(pa.DataFrameModel):
     detection_timestamp: Series[pd.Timestamp] = pa.Field(nullable=True)
     device: str = pa.Field()
     site: str = pa.Field()
-    location_id: str = pa.Field()
+    location: str = pa.Field()
     habitat: str = pa.Field()
     w3w: str = pa.Field()
     deployment_timestamp: Series[pd.Timestamp] = pa.Field(nullable=True)
