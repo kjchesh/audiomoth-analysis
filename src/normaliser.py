@@ -1,8 +1,19 @@
-"""The audiomoth data needs some basic cleaning to have consistent column names and types."""
+"""The audiomoth data needs some basic cleaning to have consistent column names and types. Once completed the data can be validated against the schema."""
 
 import pandas as pd
 from pathlib import Path
 import datetime as dt
+
+
+def get_excel_sheets(excel_path: Path) -> dict[str, pd.DataFrame]:
+    """Read all sheets from the given Excel file into a dictionary of
+    DataFrames. Each DataFrame will have cleaned column names.
+    """
+    sheets = pd.read_excel(excel_path, sheet_name=None)
+    for name, df in sheets.items():
+        new_df = clean_column_names(df)
+        sheets[name] = new_df
+    return sheets
 
 
 def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
@@ -28,13 +39,14 @@ def combine_date_and_time(
 
     Assumes:
         - date_col contains datetime64, datetime.date, or string-parsable dates
-        - time_col contains datetime.time objects
 
     Result:
         df[output_col] is a pandas datetime64[ns] column.
     """
     df = df.copy()
 
+    # Parse time flexibly (handles 13:05, 1:05 PM, datetime.time)
+    df[time_col] = df[time_col].map(to_time)
     # Ensure date column is pandas datetime
     df[date_col] = pd.to_datetime(df[date_col], errors="coerce")
 
@@ -48,58 +60,43 @@ def combine_date_and_time(
     return df
 
 
-def get_excel_sheets(excel_path: Path) -> dict[str, pd.DataFrame]:
-    """Read all sheets from the given Excel file into a dictionary of
-    DataFrames. Each DataFrame will have cleaned column names.
+def to_time(value) -> dt.time | None:
+    """Transform a value into a datetime.time object.
+    Handles strings and pandas Timestamps.
     """
-    sheets = pd.read_excel(excel_path, sheet_name=None)
-    for name, df in sheets.items():
-        new_df = clean_column_names(df)
-        sheets[name] = new_df
-    return sheets
+    if pd.isna(value):
+        return None
+
+    # Already a time
+    if isinstance(value, dt.time):
+        return value
+
+    # Pandas Timestamp
+    if isinstance(value, pd.Timestamp):
+        return value.time()
+
+    # String (13:05, 1:05 PM, etc.)
+    return pd.to_datetime(value, errors="raise").time()
 
 
 def flatten_data(sheets: dict[str, pd.DataFrame]) -> pd.DataFrame:
-    """
-    Combine the Overview sheet with all device sheets and return a single
-    flat DataFrame where each row represents one detection event.
+    # Read the two sheets
+    overview = sheets["Overview"]
+    all_data = sheets["All Data"]
+    # Flatten: attach overview metadata to every detection row
+    flat = all_data.merge(
+        overview,
+        on="device",
+        how="left",  # keep all detections even if some metadata missing
+        validate="m:1",  # ensures only one overview row per device, no duplication of detections
+    )
+    # or more simply:
+    overview_cols = overview.columns
 
-    Assumes:
-        - "Overview" contains device metadata (location, deployment dates, etc.)
-        - Each remaining sheet is a device, and the sheet name is the device_id
-    """
-    # Split out the overview sheet, keep the rest as device sheets
-    overview_df = sheets.pop("Overview")  # overview_df is now your metadata
-    # table
-    device_dfs = []
+    mask = flat[overview_cols].isna().all(axis=1)
 
-    for sheet_name, df in sheets.items():
-        device_id = sheet_name  # sheet name == device id
+    unmatched_devices = flat.loc[mask, "device"].unique()
 
-        # Find the matching row in the overview sheet
-        meta_row = overview_df.loc[overview_df["device"] == device_id]
+    print("Devices missing overview metadata:", unmatched_devices)
 
-        if meta_row.empty:
-            # No metadata found for this device – you can skip or warn
-            print(f"Warning: no overview metadata for device '{device_id}'")
-            continue
-
-        # Take the first (and usually only) matching row as a Series
-        meta = meta_row.iloc[0]
-
-        # Optionally add device_id as a column to the device dataframe
-        if "device" not in df.columns:
-            df["device"] = device_id
-
-        # Broadcast all metadata columns onto each row of this device df
-        for col, val in meta.items():
-            # Avoid overwriting existing columns in the device data
-            if col not in df.columns:
-                df[col] = val
-
-        device_dfs.append(df)
-
-    # Combine all device dataframes into one big dataframe
-    combined_df = pd.concat(device_dfs, ignore_index=True)
-
-    return combined_df
+    return flat
