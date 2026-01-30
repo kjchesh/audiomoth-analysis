@@ -5,6 +5,7 @@ pytest
 matplotlib
 jupyter
 ipykernel
+pyarrow
 
 # Dev tools
 pre-commit
