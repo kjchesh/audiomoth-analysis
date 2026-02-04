@@ -27,6 +27,7 @@ htmlcov/
 tmp/
 data_raw/
 data_processed/
+outputs/
 
 # Jupyter notebook checkpoints
 .ipynb_checkpoints/
