@@ -1,13 +1,13 @@
 pandas
 numpy
 openpyxl
-pytest
 matplotlib
 jupyter
 ipykernel
 pyarrow
 
 # Dev tools
+pytest
 pre-commit
 black
 ruff
