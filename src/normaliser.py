@@ -1,19 +1,7 @@
 """The audiomoth data needs some basic cleaning to have consistent column names and types. Once completed the data can be validated against the schema."""
 
 import pandas as pd
-from pathlib import Path
 import datetime as dt
-
-
-def get_excel_sheets(excel_path: Path) -> dict[str, pd.DataFrame]:
-    """Read all sheets from the given Excel file into a dictionary of
-    DataFrames. Each DataFrame will have cleaned column names.
-    """
-    sheets = pd.read_excel(excel_path, sheet_name=None)
-    for name, df in sheets.items():
-        new_df = clean_column_names(df)
-        sheets[name] = new_df
-    return sheets
 
 
 def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
