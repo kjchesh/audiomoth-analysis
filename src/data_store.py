@@ -14,3 +14,13 @@ def get_excel_sheets(excel_path: Path) -> dict[str, pd.DataFrame]:
         new_df = clean_column_names(df)
         sheets[name] = new_df
     return sheets
+
+
+def save_dataframes_to_csv(
+    dataframes: dict[str, pd.DataFrame], output_dir: Path
+) -> None:
+    """Save each DataFrame in the given dictionary to a CSV file in the specified output directory."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for name, df in dataframes.items():
+        csv_path = output_dir / f"{name}.csv"
+        df.to_csv(csv_path, index=False)
