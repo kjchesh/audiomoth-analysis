@@ -16,11 +16,8 @@ def get_excel_sheets(excel_path: Path) -> dict[str, pd.DataFrame]:
     return sheets
 
 
-def save_dataframes_to_csv(
-    dataframes: dict[str, pd.DataFrame], output_dir: Path
-) -> None:
+def save_dataframe_to_csv(dataframe: pd.DataFrame, output_dir: Path, name: str) -> None:
     """Save each DataFrame in the given dictionary to a CSV file in the specified output directory."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    for name, df in dataframes.items():
-        csv_path = output_dir / f"{name}.csv"
-        df.to_csv(csv_path, index=False)
+    csv_path = output_dir / f"{name}.csv"
+    dataframe.to_csv(csv_path, index=False)
