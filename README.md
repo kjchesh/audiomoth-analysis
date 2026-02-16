@@ -1,17 +1,21 @@
-## AudioMoth Data Analysis
+# AudioMoth Data Analysis
 
-This project explores and analyses bird detections from AudioMoth deployments using BirdNET-style outputs. The focus is on understanding site-level patterns and assessing detection confidence as groundwork for future analysis or modelling.
+This project explores and analyses bird detections from AudioMoth deployments using BirdNET-style outputs. The focus is on understanding spatial and temporal detection and species patterns across sites and devices.
 
-### Currently includes
+## Currently includes
 
 - Python utilities for loading, cleaning, and validating detection data
 
-- Jupyter notebooks for exploratory analysis of:
+- Derivation of deployment effort metrics (active device days)
 
-- species richness and activity across sites
+- Effort-standardised detection summaries at device and site level
 
-- dominant species patterns
+## Jupyter notebooks for exploratory and applied analysis of:
 
-- detection confidence across sites and species
+- Species richness and activity across sites
 
-This work is exploratory and intended to establish data quality and assumptions.
+- Dominant species patterns
+
+- Detection confidence across sites and species
+
+- Hourly, weekly and monthly detection patterns across sites and devices
