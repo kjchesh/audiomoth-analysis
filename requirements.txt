@@ -5,6 +5,7 @@ matplotlib
 jupyter
 ipykernel
 pyarrow
+pandera
 
 # Dev tools
 pytest
