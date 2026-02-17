@@ -22,23 +22,6 @@ This project explores and analyses bird detections from AudioMoth deployments us
 
 ## Running the Project Notebooks
 
-<<<<<<< Updated upstream
-You will need access to the audiomoth dataset
-
-### Clone respository
-
-<pre>git clone kjchesh/audiomoth-analysis  
-cd <YOUR_REPO_FOLDER> </pre>
-
-### Create & Activate a Virtual Environment
-
-#### Windows
-<pre>python -m venv .venv  
-.venv\Scripts\activate </pre>
-
-#### macOS/Linux
-<pre>python -m venv .venv  
-=======
 You will need access to the audiomoth dataset + have python installed.
 
 ### Clone respository
@@ -56,15 +39,12 @@ cd audiomoth-analysis  </pre>
 
 #### macOS/Linux
 <pre>
->>>>>>> Stashed changes
 source .venv/bin/activate</pre>
 
 ### Install Dependencies
 <pre>pip install -r requirements.txt</pre>
 
 
-<<<<<<< Updated upstream
-=======
 ### Data
 
     Create a folder in the repo root called data_raw
@@ -82,31 +62,11 @@ Tables saved within notebooks are stored (as csv files) in
 <pre>python -m ipykernel install --user --name audiomoth-analysis --display-name "Python (audiomoth-analysis)" </pre>
 
 
->>>>>>> Stashed changes
 ### Launch Jupyter
 <pre>jupyter lab</pre>
 
 #### Inside Jupyter:
 
-<<<<<<< Updated upstream
-    Open a notebook
-
-    Go to Kernel → Change Kernel
-
-    Select the environment named .venv
-
-
-### Data
-
-    Paste your excel data into the folder  
-    data_raw/
-
-    processed data will be stored in  
-    data_processed/
-
-    Tables saved within notebooks are stored (as csv files) in  
-    outputs/
-=======
     Open a notebook (start with 01_data_preparation since the other notebooks rely on the data_processed/analysis_df output created in that notebook)
 
     Go to Kernel → Change Kernel
@@ -114,4 +74,3 @@ Tables saved within notebooks are stored (as csv files) in
     Select the environment named Python (audiomoth-analysis)
 
     Go to Run → Run All Cells
->>>>>>> Stashed changes
